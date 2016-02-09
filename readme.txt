@@ -11,6 +11,8 @@ WP REST API companion plugin for post meta endpoints.
 
 == Description ==
 
+[![Build Status](https://travis-ci.org/WP-API/wp-api-meta-endpoints.svg?branch=master)](https://travis-ci.org/WP-API/wp-api-meta-endpoints)
+
 WP REST API companion plugin for post meta endpoints.
 
 == Changelog ==

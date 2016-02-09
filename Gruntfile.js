@@ -27,6 +27,14 @@ module.exports = function( grunt ) {
 			files: ['lib/**/*.php', 'tests/*.php', '*.php']
 		},
 
+		wp_readme_to_markdown: {
+			your_target: {
+				files: {
+					'README.md': 'readme.txt'
+				}
+			},
+		},
+
 		phpunit: {
 			'default': {
 				cmd: 'phpunit',
@@ -53,6 +61,9 @@ module.exports = function( grunt ) {
 			opts: {stdio: 'inherit'}
 		}, this.async());
 	});
+
+	grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown' );
+	grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
 
 	grunt.registerTask( 'test', [ 'phpcs', 'phplint', 'phpunit:default', 'phpunit:multisite' ] );
 	grunt.util.linefeed = '\n';
