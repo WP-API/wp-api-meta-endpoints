@@ -79,23 +79,99 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 	}
 
 	public function test_get_item() {
-		// No op
+		wp_set_current_user( $this->user );
+
+		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertCount( 3, $data );
+
+		if ( $data['id'] === $meta_id ) {
+			$this->assertEquals( 'testkey', $data['key'] );
+			$this->assertEquals( 'testvalue', $data['value'] );
+		} else {
+			$this->fail();
+		}
 	}
 
 	public function test_create_item() {
-		// No op
+		wp_set_current_user( $this->user );
+
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/users/%d/meta', $this->user ) );
+		$request->set_body_params( array(
+			'key'   => 'testkey',
+			'value' => 'testvalue',
+		) );
+		$response = $this->server->dispatch( $request );
+
+		$meta = get_user_meta( $this->user, 'testkey', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 'testvalue', $meta[0] );
+
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'id', $data );
+		$this->assertEquals( 'testkey', $data['key'] );
+		$this->assertEquals( 'testvalue', $data['value'] );
 	}
 
 	public function test_update_item() {
-		// No op
+		wp_set_current_user( $this->user );
+		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
+		$request->set_body_params( array(
+			'value' => 'testnewvalue',
+		) );
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertEquals( $meta_id, $data['id'] );
+		$this->assertEquals( 'testkey', $data['key'] );
+		$this->assertEquals( 'testnewvalue', $data['value'] );
+
+		$meta = get_user_meta( $this->user, 'testkey', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 'testnewvalue', $meta[0] );
 	}
 
 	public function test_delete_item() {
-		// No op
+		wp_set_current_user( $this->user );
+		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
+
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
+		$request['force'] = true;
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'message', $data );
+		$this->assertNotEmpty( $data['message'] );
+
+		$meta = get_user_meta( $this->user, 'testkey', false );
+		$this->assertEmpty( $meta );
 	}
 
 	public function test_prepare_item() {
-		// No op
+		wp_set_current_user( $this->user );
+		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$this->assertEquals( $meta_id, $data['id'] );
+		$this->assertEquals( 'testkey', $data['key'] );
+		$this->assertEquals( 'testvalue', $data['value'] );
 	}
 
 	public function test_get_item_schema() {
