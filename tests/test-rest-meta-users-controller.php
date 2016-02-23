@@ -43,6 +43,7 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_get_items() {
 		wp_set_current_user( $this->user );
+		$this->allow_user_to_manage_multisite();
 
 		$meta_id_serialized         = add_user_meta( $this->user, 'testkey_serialized', array( 'testvalue1', 'testvalue2' ) );
 		$meta_id_serialized_object  = add_user_meta( $this->user, 'testkey_serialized_object', (object) array( 'testvalue' => 'test' ) );
@@ -80,6 +81,7 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_get_item() {
 		wp_set_current_user( $this->user );
+		$this->allow_user_to_manage_multisite();
 
 		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
 
@@ -100,6 +102,7 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_create_item() {
 		wp_set_current_user( $this->user );
+		$this->allow_user_to_manage_multisite();
 
 		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/users/%d/meta', $this->user ) );
 		$request->set_body_params( array(
@@ -121,6 +124,7 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_update_item() {
 		wp_set_current_user( $this->user );
+		$this->allow_user_to_manage_multisite();
 		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
@@ -145,6 +149,7 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_delete_item() {
 		wp_set_current_user( $this->user );
+		$this->allow_user_to_manage_multisite();
 		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
@@ -163,6 +168,8 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_prepare_item() {
 		wp_set_current_user( $this->user );
+		$this->allow_user_to_manage_multisite();
+		
 		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
@@ -176,5 +183,14 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 
 	public function test_get_item_schema() {
 		// No op
+	}
+
+	protected function allow_user_to_manage_multisite() {
+		wp_set_current_user( $this->user );
+		$user = wp_get_current_user();
+		if ( is_multisite() ) {
+			update_site_option( 'site_admins', array( $user->user_login ) );
+		}
+		return;
 	}
 }
