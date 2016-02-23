@@ -36,7 +36,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	 * @return WP_Error|boolean
 	 */
 	public function get_items_permissions_check( $request ) {
-		$parent = get_post( (int) $request['parent_id'] );
+		$parent = get_user_by( 'id', (int) $request['parent_id'] );
 
 		if ( empty( $parent ) || empty( $parent->ID ) ) {
 			return new WP_Error( 'rest_user_invalid_id', __( 'Invalid user id.' ), array( 'status' => 404 ) );
@@ -92,7 +92,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	 * @return WP_Error|boolean
 	 */
 	public function delete_item_permissions_check( $request ) {
-		$parent = get_post( (int) $request['parent_id'] );
+		$parent = get_user_by( 'id', (int) $request['parent_id'] );
 
 		if ( empty( $parent ) || empty( $parent->ID ) ) {
 			return new WP_Error( 'rest_user_invalid_id', __( 'Invalid user id.' ), array( 'status' => 404 ) );
@@ -105,7 +105,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 		}
 		*/
 
-		if ( ! current_user_can( 'edit_users', $parent->ID ) ) {
+		if ( ! current_user_can( 'delete_users', $parent->ID ) ) {
 			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot delete the meta for this user.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
