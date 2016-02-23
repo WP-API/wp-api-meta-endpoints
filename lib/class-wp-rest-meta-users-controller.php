@@ -5,14 +5,14 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	/**
 	 * Associated object type.
 	 *
-	 * @var string Type slug ("post", "user", or "comment")
+	 * @var string "user"
 	 */
 	protected $parent_type = 'user';
 
 	/**
 	 * Base path for parent meta type endpoints.
 	 *
-	 * @var string
+	 * @var string "users"
 	 */
 	protected $parent_base = 'users';
 
@@ -49,7 +49,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 		}
 		*/
 
-		if ( ! current_user_can( 'edit_users', $parent->ID ) ) {
+		if ( ! current_user_can( 'edit_user', $parent->ID ) ) {
 			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot view the meta for this user.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
@@ -105,7 +105,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 		}
 		*/
 
-		if ( ! current_user_can( 'delete_users', $parent->ID ) ) {
+		if ( ! current_user_can( 'delete_user', $parent->ID ) ) {
 			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot delete the meta for this user.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
