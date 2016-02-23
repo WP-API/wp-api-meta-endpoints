@@ -10,12 +10,9 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 	public function setUp() {
 		parent::setUp();
 
-		$this->user = $this->factory->user->create();
-		wp_set_current_user( $this->user );
-		$this->user_obj = wp_get_current_user();
-		$this->user_obj->add_role( 'adminstrator' );
-		$this->user_obj->add_cap( 'edit_users' );
-		$this->user_obj->add_cap( 'delete_users' );
+		$this->user = $this->factory->user->create( array(
+			'role' => 'administrator',
+		) );
 	}
 
 	public function test_register_routes() {
@@ -45,13 +42,14 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 	}
 
 	public function test_get_items() {
-		$user_id                    = $this->factory->user->create();
-		$meta_id_serialized         = add_user_meta( $user_id, 'testkey_serialized', array( 'testvalue1', 'testvalue2' ) );
-		$meta_id_serialized_object  = add_user_meta( $user_id, 'testkey_serialized_object', (object) array( 'testvalue' => 'test' ) );
-		$meta_id_serialized_array   = add_user_meta( $user_id, 'testkey_serialized_array', serialize( array( 'testkey1' => 'testvalue1', 'testkey2' => 'testvalue2' ) ) );
-		$meta_id_protected          = add_user_meta( $user_id, '_testkey', 'testvalue' );
+		wp_set_current_user( $this->user );
 
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d/meta', $user_id ) );
+		$meta_id_serialized         = add_user_meta( $this->user, 'testkey_serialized', array( 'testvalue1', 'testvalue2' ) );
+		$meta_id_serialized_object  = add_user_meta( $this->user, 'testkey_serialized_object', (object) array( 'testvalue' => 'test' ) );
+		$meta_id_serialized_array   = add_user_meta( $this->user, 'testkey_serialized_array', serialize( array( 'testkey1' => 'testvalue1', 'testkey2' => 'testvalue2' ) ) );
+		$meta_id_protected          = add_user_meta( $this->user, '_testkey', 'testvalue' );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d/meta', $this->user ) );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
