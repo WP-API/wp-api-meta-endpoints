@@ -169,7 +169,7 @@ class WP_Test_REST_Meta_Users_Controller extends WP_Test_REST_Controller_Testcas
 	public function test_prepare_item() {
 		wp_set_current_user( $this->user );
 		$this->allow_user_to_manage_multisite();
-		
+
 		$meta_id = add_user_meta( $this->user, 'testkey', 'testvalue' );
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d/meta/%d', $this->user, $meta_id ) );
