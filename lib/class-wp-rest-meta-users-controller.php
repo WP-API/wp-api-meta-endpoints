@@ -30,7 +30,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to get meta for a post.
+	 * Check if a given request has access to get meta for a user.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|boolean
@@ -56,7 +56,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to get a specific meta entry for a post.
+	 * Check if a given request has access to get a specific meta entry for a user.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|boolean
@@ -66,7 +66,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to create a meta entry for a post.
+	 * Check if a given request has access to create a meta entry for a user.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|boolean
@@ -76,7 +76,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to update a meta entry for a post.
+	 * Check if a given request has access to update a meta entry for a user.
 	 *
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|boolean
@@ -86,7 +86,7 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to delete meta for a post.
+	 * Check if a given request has access to delete meta for a user.
 	 *
 	 * @param  WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|boolean
