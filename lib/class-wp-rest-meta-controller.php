@@ -149,7 +149,20 @@ abstract class WP_REST_Meta_Controller extends WP_REST_Controller {
 	 * @return string
 	 */
 	protected function get_parent_column() {
-		return ( 'user' === $this->parent_type ) ? 'user_id' : 'post_id';
+		$parent_column = 'post_id';
+
+		switch ( $this->parent_type ) {
+			case 'user':
+				return 'user_id';
+			case 'comment':
+				return 'comment_id';
+			case 'term':
+				return 'term_id';
+			default:
+				return $parent_column;
+		}
+
+		return $parent_column;
 	}
 
 	/**
