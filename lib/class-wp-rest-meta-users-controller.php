@@ -36,20 +36,13 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	 * @return WP_Error|boolean
 	 */
 	public function get_items_permissions_check( $request ) {
-		$parent = get_user_by( 'id', (int) $request['parent_id'] );
+		$user = get_user_by( 'id', (int) $request['parent_id'] );
 
-		if ( empty( $parent ) || empty( $parent->ID ) ) {
+		if ( empty( $user ) || empty( $user->ID ) ) {
 			return new WP_Error( 'rest_user_invalid_id', __( 'Invalid user id.' ), array( 'status' => 404 ) );
 		}
 
-		/* @todo Add a new check to read user
-
-		if ( ! $this->parent_controller->check_read_permission( $parent ) ) {
-			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot view this user.' ), array( 'status' => rest_authorization_required_code() ) );
-		}
-		*/
-
-		if ( ! current_user_can( 'edit_user', $parent->ID ) ) {
+		if ( ! current_user_can( 'edit_user', $user->ID ) ) {
 			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot view the meta for this user.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
@@ -92,20 +85,13 @@ class WP_REST_Meta_Users_Controller extends WP_REST_Meta_Controller {
 	 * @return WP_Error|boolean
 	 */
 	public function delete_item_permissions_check( $request ) {
-		$parent = get_user_by( 'id', (int) $request['parent_id'] );
+		$user = get_user_by( 'id', (int) $request['parent_id'] );
 
-		if ( empty( $parent ) || empty( $parent->ID ) ) {
+		if ( empty( $user ) || empty( $user->ID ) ) {
 			return new WP_Error( 'rest_user_invalid_id', __( 'Invalid user id.' ), array( 'status' => 404 ) );
 		}
 
-		/* @todo Add a new check to read user
-
-		if ( ! $this->parent_controller->check_read_permission( $parent ) ) {
-			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot view this user.' ), array( 'status' => rest_authorization_required_code() ) );
-		}
-		*/
-
-		if ( ! current_user_can( 'delete_user', $parent->ID ) ) {
+		if ( ! current_user_can( 'delete_user', $user->ID ) ) {
 			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot delete the meta for this user.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
