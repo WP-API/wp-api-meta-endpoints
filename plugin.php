@@ -22,6 +22,11 @@ function meta_rest_api_init() {
 	}
 
 	if ( class_exists( 'WP_REST_Controller' )
+		&& ! class_exists( 'WP_REST_Meta_Users_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/lib/class-wp-rest-meta-users-controller.php';
+	}
+
+	if ( class_exists( 'WP_REST_Controller' )
 		&& ! class_exists( 'WP_REST_Meta_Comments_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/lib/class-wp-rest-meta-comments-controller.php';
 	}
@@ -33,8 +38,12 @@ function meta_rest_api_init() {
 		}
 	}
 
+	$user_meta_controller = new WP_REST_Meta_Users_Controller();
+	$user_meta_controller->register_routes();
+
 	$comment_meta_controller = new WP_REST_Meta_Comments_Controller();
 	$comment_meta_controller->register_routes();
+
 }
 
 add_action( 'rest_api_init', 'meta_rest_api_init', 11 );
