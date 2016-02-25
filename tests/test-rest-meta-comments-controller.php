@@ -160,7 +160,6 @@ class WP_Test_REST_Meta_Comments_Controller extends WP_Test_REST_Controller_Test
 		$this->assertErrorResponse( 'rest_meta_protected', $response, 403 );
 	}
 	public function test_get_item_unauthenticated() {
-		wp_set_current_user( $this->admin_id );
 		$meta_id = add_comment_meta( $this->approved_id, 'testkey', 'testvalue' );
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%d/meta/%d', $this->approved_id, $meta_id ) );
@@ -195,7 +194,6 @@ class WP_Test_REST_Meta_Comments_Controller extends WP_Test_REST_Controller_Test
 		$this->assertErrorResponse( 'rest_comment_invalid_id', $response );
 	}
 	public function test_get_items_unauthenticated() {
-		wp_set_current_user( $this->admin_id );
 		add_comment_meta( $this->approved_id, 'testkey', 'testvalue' );
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%d/meta', $this->approved_id ) );
@@ -708,7 +706,6 @@ class WP_Test_REST_Meta_Comments_Controller extends WP_Test_REST_Controller_Test
 		$this->assertEquals( array( 'testvalue' ), get_comment_meta( $this->approved_id, 'testkey', false ) );
 	}
 	public function test_delete_item_unauthenticated() {
-		wp_set_current_user( $this->admin_id );
 		$meta_id = add_comment_meta( $this->approved_id, 'testkey', 'testvalue' );
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/comments/%d/meta/%d', $this->approved_id, $meta_id ) );
