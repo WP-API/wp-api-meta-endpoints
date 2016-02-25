@@ -43,7 +43,6 @@ function meta_rest_api_init() {
 
 	$comment_meta_controller = new WP_REST_Meta_Comments_Controller();
 	$comment_meta_controller->register_routes();
-
 }
 
 add_action( 'rest_api_init', 'meta_rest_api_init', 11 );
