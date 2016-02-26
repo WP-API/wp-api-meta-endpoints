@@ -26,6 +26,11 @@ function meta_rest_api_init() {
 		require_once dirname( __FILE__ ) . '/lib/class-wp-rest-meta-users-controller.php';
 	}
 
+	if ( class_exists( 'WP_REST_Controller' )
+		&& ! class_exists( 'WP_REST_Meta_Comments_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/lib/class-wp-rest-meta-comments-controller.php';
+	}
+
 	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
 		if ( post_type_supports( $post_type->name, 'custom-fields' ) ) {
 			$meta_controller = new WP_REST_Meta_Posts_Controller( $post_type->name );
@@ -35,6 +40,9 @@ function meta_rest_api_init() {
 
 	$user_meta_controller = new WP_REST_Meta_Users_Controller();
 	$user_meta_controller->register_routes();
+
+	$comment_meta_controller = new WP_REST_Meta_Comments_Controller();
+	$comment_meta_controller->register_routes();
 }
 
 add_action( 'rest_api_init', 'meta_rest_api_init', 11 );
