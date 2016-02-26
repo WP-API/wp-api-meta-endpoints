@@ -92,7 +92,7 @@ class WP_REST_Meta_Comments_Controller extends WP_REST_Meta_Controller {
 			return new WP_Error( 'rest_comment_invalid_id', __( 'Invalid comment id.' ), array( 'status' => 404 ) );
 		}
 
-		if ( ! current_user_can( 'moderate_comments' ) ) {
+		if ( ! current_user_can( 'edit_comment', $comment->comment_ID ) ) {
 			return new WP_Error( 'rest_forbidden', __( 'Sorry, you cannot delete the meta for this comment.' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		return true;
