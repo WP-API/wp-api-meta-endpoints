@@ -156,6 +156,8 @@ abstract class WP_REST_Meta_Controller extends WP_REST_Controller {
 				return 'user_id';
 			case 'comment':
 				return 'comment_id';
+			case 'term':
+				return 'term_id';
 			default:
 				return $parent_column;
 		}
