@@ -22,7 +22,7 @@
         "wp-coding-standards/wpcs": "0.6.0"
     },
     "extra": {
-        "installer-name": "json-rest-api"
+        "installer-name": "json-rest-api-meta-endpoints"
     },
     "scripts": {
         "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs",
