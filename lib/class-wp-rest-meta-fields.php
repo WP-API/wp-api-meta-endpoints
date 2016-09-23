@@ -240,15 +240,17 @@ abstract class WP_REST_Meta_Fields {
 			}
 
 			$default_args = array(
-				'name'        => $name,
-				'single'      => $args['single'],
-				'schema'      => array(
-					'type'        => empty( $args['type'] ) ? null : $args['type'],
-					'description' => empty( $args['description'] ) ? '' : $args['description'],
-					'default'     => isset( $args['default'] ) ? $args['default'] : null,
-				),
+				'name'   => $name,
+				'single' => $args['single'],
+				'schema' => array(),
+			);
+			$default_schema = array(
+				'type'        => empty( $args['type'] ) ? null : $args['type'],
+				'description' => empty( $args['description'] ) ? '' : $args['description'],
+				'default'     => isset( $args['default'] ) ? $args['default'] : null,
 			);
 			$rest_args = array_merge( $default_args, $rest_args );
+			$rest_args['schema'] = array_merge( $default_schema, $rest_args['schema'] );
 
 			// skip over settings that don't have a defined type in the schema
 			if ( empty( $rest_args['schema']['type'] ) ) {
