@@ -37,3 +37,30 @@ function meta_rest_api_init() {
 }
 
 add_action( 'rest_api_init', 'meta_rest_api_init', 11 );
+
+/**
+ * Prepare a meta value for output.
+ *
+ * Default preparation for meta fields. Override by passing the
+ * `prepare_callback` in your `show_in_rest` options.
+ *
+ * @param mixed $value Meta value from the database.
+ * @param WP_REST_Request $request Request object.
+ * @param array $args REST-specific options for the meta key.
+ * @return mixed Value prepared for output.
+ */
+function meta_rest_api_prepare_value( $value, $request, $args ) {
+	switch ( $args['schema']['type'] ) {
+		case 'string':
+			$value = strval( $value );
+			break;
+		case 'number':
+			$value = floatval( $value );
+			break;
+		case 'boolean':
+			$value = (bool) $value;
+			break;
+	}
+
+	return $value;
+}

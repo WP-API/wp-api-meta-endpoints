@@ -48,11 +48,11 @@ abstract class WP_REST_Meta_Fields {
 				} else {
 					$value = $all_values[0];
 				}
-				$value = $this->prepare_value_for_response( $value, $name, $args );
+				$value = $this->prepare_value_for_response( $value, $request, $args );
 			} else {
 				$value = array();
 				foreach ( $all_values as $row ) {
-					$value[] = $this->prepare_value_for_response( $row, $name, $args );
+					$value[] = $this->prepare_value_for_response( $row, $request, $args );
 				}
 			}
 
@@ -70,21 +70,13 @@ abstract class WP_REST_Meta_Fields {
 	 * before passing back to JSON.
 	 *
 	 * @param mixed $value Value to prepare.
-	 * @param string $name Meta key.
+	 * @param WP_REST_Request $request Current request object.
 	 * @param array $args Options for the field.
 	 * @return mixed Prepared value.
 	 */
-	protected function prepare_value_for_response( $value, $name, $args ) {
-		switch ( $args['schema']['type'] ) {
-			case 'string':
-				$value = strval( $value );
-				break;
-			case 'number':
-				$value = floatval( $value );
-				break;
-			case 'boolean':
-				$value = (bool) $value;
-				break;
+	protected function prepare_value_for_response( $value, $request, $args ) {
+		if ( ! empty( $args['prepare_callback'] ) ) {
+			$value = call_user_func( $args['prepare_callback'], $value, $request, $args );
 		}
 
 		return $value;
@@ -240,9 +232,10 @@ abstract class WP_REST_Meta_Fields {
 			}
 
 			$default_args = array(
-				'name'   => $name,
-				'single' => $args['single'],
-				'schema' => array(),
+				'name'             => $name,
+				'single'           => $args['single'],
+				'schema'           => array(),
+				'prepare_callback' => 'meta_rest_api_prepare_value',
 			);
 			$default_schema = array(
 				'type'        => empty( $args['type'] ) ? null : $args['type'],
