@@ -142,4 +142,49 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		// Check that the value wasn't actually updated.
 		$this->assertEmpty( get_post_meta( $this->post_id, 'test_single', false ) );
 	}
+
+	public function test_set_value_multiple() {
+		// Ensure no data exists currently.
+		$values = get_post_meta( $this->post_id, 'test_multi', false );
+		$this->assertEmpty( $values );
+
+		// Ensure we have write permission.
+		$user = $this->factory->user->create( array(
+			'role' => 'editor',
+		));
+		wp_set_current_user( $user );
+
+		$data = array(
+			'meta' => array(
+				'test_multi' => [ 'val1' ],
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 'val1', $meta[0] );
+
+		// Add another value.
+		$data = array(
+			'meta' => array(
+				'test_multi' => [ 'val1', 'val2' ],
+			),
+		);
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 2, $meta );
+		$this->assertContains( 'val1', $meta );
+		$this->assertContains( 'val2', $meta );
+	}
 }
