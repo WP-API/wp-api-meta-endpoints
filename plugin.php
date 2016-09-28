@@ -16,7 +16,6 @@ function meta_rest_api_init() {
 	require_once dirname( __FILE__ ) . '/lib/class-wp-rest-term-meta-fields.php';
 	require_once dirname( __FILE__ ) . '/lib/class-wp-rest-user-meta-fields.php';
 
-
 	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
 		if ( post_type_supports( $post_type->name, 'custom-fields' ) ) {
 			$post_meta = new WP_REST_Post_Meta_Fields( $post_type->name );
