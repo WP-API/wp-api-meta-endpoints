@@ -62,5 +62,10 @@ function meta_rest_api_prepare_value( $value, $request, $args ) {
 			break;
 	}
 
+	// Don't allow objects to be output.
+	if ( is_object( $value ) && ! ( $value instanceof JsonSerializable ) ) {
+		return null;
+	}
+
 	return $value;
 }
