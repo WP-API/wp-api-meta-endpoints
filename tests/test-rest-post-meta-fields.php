@@ -156,7 +156,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		$data = array(
 			'meta' => array(
-				'test_multi' => [ 'val1' ],
+				'test_multi' => array( 'val1' ),
 			),
 		);
 		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
@@ -173,7 +173,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		// Add another value.
 		$data = array(
 			'meta' => array(
-				'test_multi' => [ 'val1', 'val2' ],
+				'test_multi' => array( 'val1', 'val2' ),
 			),
 		);
 		$request->set_body_params( $data );
