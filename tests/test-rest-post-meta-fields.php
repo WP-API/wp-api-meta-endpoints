@@ -23,6 +23,16 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 			'show_in_rest' => true,
 			'single' => false,
 		));
+		register_meta( 'post', 'test_bad_auth', array(
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_false',
+		));
+		register_meta( 'post', 'test_bad_auth_multi', array(
+			'show_in_rest' => true,
+			'single' => false,
+			'auth_callback' => '__return_false',
+		));
 
 		$this->post_id = $this->factory->post->create();
 	}
@@ -147,6 +157,26 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertEmpty( get_post_meta( $this->post_id, 'test_single', false ) );
 	}
 
+	/**
+	 * @depends test_set_value
+	 */
+	public function test_set_value_blocked() {
+		$data = array(
+			'meta' => array(
+				'test_bad_auth' => 'test_value',
+			),
+		);
+
+		$this->grant_write_permission();
+
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_update', $response, 403 );
+		$this->assertEmpty( get_post_meta( $this->post_id, 'test_bad_auth', false ) );
+	}
+
 	public function test_set_value_multiple() {
 		// Ensure no data exists currently.
 		$values = get_post_meta( $this->post_id, 'test_multi', false );
@@ -211,6 +241,26 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		$meta = get_post_meta( $this->post_id, 'test_multi', false );
 		$this->assertEmpty( $meta );
+	}
+
+	/**
+	 * @depends test_set_value_multiple
+	 */
+	public function test_set_value_multiple_blocked() {
+		$data = array(
+			'meta' => array(
+				'test_bad_auth_multi' => array( 'test_value' ),
+			),
+		);
+
+		$this->grant_write_permission();
+
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_update', $response, 403 );
+		$this->assertEmpty( get_post_meta( $this->post_id, 'test_bad_auth_multi', false ) );
 	}
 
 	public function test_add_multi_value_db_error() {
