@@ -33,6 +33,10 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 			'single' => false,
 			'auth_callback' => '__return_false',
 		));
+		register_meta( 'post', 'test_no_rest', array());
+		register_meta( 'post', 'test_rest_disabled', array(
+			'show_in_rest' => false,
+		));
 
 		$this->post_id = $this->factory->post->create();
 	}
@@ -101,6 +105,36 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$meta = (array) $data['meta'];
 		$this->assertArrayNotHasKey( 'test_unregistered', $meta );
+	}
+
+	/**
+	 * @depends test_get_value
+	 */
+	public function test_get_registered_no_api_access() {
+		add_post_meta( $this->post_id, 'test_no_rest', 'for_the_wicked' );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$meta = (array) $data['meta'];
+		$this->assertArrayNotHasKey( 'test_no_rest', $meta );
+	}
+
+	/**
+	 * @depends test_get_value
+	 */
+	public function test_get_registered_api_disabled() {
+		add_post_meta( $this->post_id, 'test_rest_disabled', 'sleepless_nights' );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$meta = (array) $data['meta'];
+		$this->assertArrayNotHasKey( 'test_rest_disabled', $meta );
 	}
 
 	/**
