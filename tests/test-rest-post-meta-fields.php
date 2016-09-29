@@ -27,6 +27,14 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->post_id = $this->factory->post->create();
 	}
 
+	protected function grant_write_permission() {
+		// Ensure we have write permission.
+		$user = $this->factory->user->create( array(
+			'role' => 'editor',
+		));
+		wp_set_current_user( $user );
+	}
+
 	public function test_get_value() {
 		add_post_meta( $this->post_id, 'test_single', 'testvalue' );
 
@@ -93,11 +101,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$values = get_post_meta( $this->post_id, 'test_single', false );
 		$this->assertEmpty( $values );
 
-		// Ensure we have write permission.
-		$user = $this->factory->user->create( array(
-			'role' => 'editor',
-		));
-		wp_set_current_user( $user );
+		$this->grant_write_permission();
 
 		$data = array(
 			'meta' => array(
@@ -148,11 +152,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$values = get_post_meta( $this->post_id, 'test_multi', false );
 		$this->assertEmpty( $values );
 
-		// Ensure we have write permission.
-		$user = $this->factory->user->create( array(
-			'role' => 'editor',
-		));
-		wp_set_current_user( $user );
+		$this->grant_write_permission();
 
 		$data = array(
 			'meta' => array(
