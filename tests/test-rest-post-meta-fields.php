@@ -380,6 +380,31 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * @depends test_delete_value
+	 */
+	public function test_delete_value_blocked() {
+		add_post_meta( $this->post_id, 'test_bad_auth', 'val1' );
+		$current = get_post_meta( $this->post_id, 'test_bad_auth', true );
+		$this->assertEquals( 'val1', $current );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'test_bad_auth' => null,
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+
+		$meta = get_post_meta( $this->post_id, 'test_bad_auth', true );
+		$this->assertEquals( 'val1', $meta );
+	}
+
+	/**
 	 * Internal function used to disable an insert query which
 	 * will trigger a wpdb error for testing purposes.
 	 */
