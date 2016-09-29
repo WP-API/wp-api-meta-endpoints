@@ -188,6 +188,31 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertContains( 'val2', $meta );
 	}
 
+	/**
+	 * @depends test_set_value_multiple
+	 */
+	public function test_set_value_multiple_unauthenticated() {
+		// Ensure no data exists currently.
+		$values = get_post_meta( $this->post_id, 'test_multi', false );
+		$this->assertEmpty( $values );
+
+		wp_set_current_user( 0 );
+
+		$data = array(
+			'meta' => array(
+				'test_multi' => array( 'val1' ),
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 401 );
+
+		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$this->assertEmpty( $meta );
+	}
+
 	public function test_add_multi_value_db_error() {
 		// Ensure no data exists currently.
 		$values = get_post_meta( $this->post_id, 'test_multi', false );
