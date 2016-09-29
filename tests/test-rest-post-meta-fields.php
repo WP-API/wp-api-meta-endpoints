@@ -33,7 +33,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 			'single' => false,
 			'auth_callback' => '__return_false',
 		));
-		register_meta( 'post', 'test_no_rest', array());
+		register_meta( 'post', 'test_no_rest', array() );
 		register_meta( 'post', 'test_rest_disabled', array(
 			'show_in_rest' => false,
 		));
