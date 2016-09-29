@@ -405,6 +405,38 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * @depends test_delete_value
+	 */
+	public function test_delete_value_db_error() {
+		add_post_meta( $this->post_id, 'test_single', 'val1' );
+		$current = get_post_meta( $this->post_id, 'test_single', true );
+		$this->assertEquals( 'val1', $current );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'test_single' => null,
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+		/**
+		 * Disable showing error as the below is going to intentionally
+		 * trigger a DB error.
+		 */
+		global $wpdb;
+		$wpdb->suppress_errors = true;
+		add_filter( 'query', array( $this, 'error_delete_query' ) );
+
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'query', array( $this, 'error_delete_query' ) );
+		$wpdb->show_errors = true;
+
+		$this->assertErrorResponse( 'rest_meta_database_error', $response, 500 );
+	}
+
+	/**
 	 * Internal function used to disable an insert query which
 	 * will trigger a wpdb error for testing purposes.
 	 */
