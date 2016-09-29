@@ -151,6 +151,52 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertArrayNotHasKey( 'test_rest_disabled', $meta );
 	}
 
+	public function test_get_value_types() {
+		register_meta( 'post', 'test_string', array(
+			'show_in_rest' => true,
+			'single' => true,
+			'type' => 'string',
+		));
+		register_meta( 'post', 'test_number', array(
+			'show_in_rest' => true,
+			'single' => true,
+			'type' => 'number',
+		));
+		register_meta( 'post', 'test_bool', array(
+			'show_in_rest' => true,
+			'single' => true,
+			'type' => 'boolean',
+		));
+
+		/** @var WP_REST_Server $wp_rest_server */
+		global $wp_rest_server;
+		$this->server = $wp_rest_server = new WP_Test_Spy_REST_Server;
+		do_action( 'rest_api_init' );
+
+		add_post_meta( $this->post_id, 'test_string', 42 );
+		add_post_meta( $this->post_id, 'test_number', '42' );
+		add_post_meta( $this->post_id, 'test_bool', 1 );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$meta = (array) $data['meta'];
+
+		$this->assertArrayHasKey( 'test_string', $meta );
+		$this->assertInternalType( 'string', $meta['test_string'] );
+		$this->assertSame( '42', $meta['test_string'] );
+
+		$this->assertArrayHasKey( 'test_number', $meta );
+		$this->assertInternalType( 'float', $meta['test_number'] );
+		$this->assertSame( 42.0, $meta['test_number'] );
+
+		$this->assertArrayHasKey( 'test_bool', $meta );
+		$this->assertInternalType( 'boolean', $meta['test_bool'] );
+		$this->assertSame( true, $meta['test_bool'] );
+	}
+
 	/**
 	 * @depends test_get_value
 	 */
