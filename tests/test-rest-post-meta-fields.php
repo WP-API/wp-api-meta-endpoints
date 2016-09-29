@@ -32,6 +32,20 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		register_meta( 'post', 'test_rest_disabled', array(
 			'show_in_rest' => false,
 		));
+		register_meta( 'post', 'test_custom_schema', array(
+			'single' => true,
+			'type' => 'integer',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type' => 'number',
+				),
+			),
+		));
+		register_meta( 'post', 'test_invalid_type', array(
+			'single' => true,
+			'type' => false,
+			'show_in_rest' => true,
+		));
 
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;
@@ -462,6 +476,32 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$wpdb->show_errors = true;
 
 		$this->assertErrorResponse( 'rest_meta_database_error', $response, 500 );
+	}
+
+	public function test_get_schema() {
+		$request = new WP_REST_Request( 'OPTIONS', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$schema = $data['schema'];
+
+		$this->assertArrayHasKey( 'meta', $schema['properties'] );
+		$meta_schema = $schema['properties']['meta']['properties'];
+
+		$this->assertArrayHasKey( 'test_single', $meta_schema );
+		$this->assertEquals( 'string', $meta_schema['test_single']['type'] );
+
+		$this->assertArrayHasKey( 'test_multi', $meta_schema );
+		$this->assertEquals( 'array', $meta_schema['test_multi']['type'] );
+		$this->assertArrayHasKey( 'items', $meta_schema['test_multi'] );
+		$this->assertEquals( 'string', $meta_schema['test_multi']['items']['type'] );
+
+		$this->assertArrayHasKey( 'test_custom_schema', $meta_schema );
+		$this->assertEquals( 'number', $meta_schema['test_custom_schema']['type'] );
+
+		$this->assertArrayNotHasKey( 'test_no_rest', $meta_schema );
+		$this->assertArrayNotHasKey( 'test_rest_disabled', $meta_schema );
+		$this->assertArrayNotHasKey( 'test_invalid_type', $meta_schema );
 	}
 
 	/**
