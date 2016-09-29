@@ -211,6 +211,34 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertEmpty( get_post_meta( $this->post_id, 'test_bad_auth', false ) );
 	}
 
+	/**
+	 * @depends test_set_value
+	 */
+	public function test_set_value_db_error() {
+		$data = array(
+			'meta' => array(
+				'test_single' => 'test_value',
+			),
+		);
+
+		$this->grant_write_permission();
+
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		/**
+		 * Disable showing error as the below is going to intentionally
+		 * trigger a DB error.
+		 */
+		global $wpdb;
+		$wpdb->suppress_errors = true;
+		add_filter( 'query', array( $this, 'error_insert_query' ) );
+
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'query', array( $this, 'error_insert_query' ) );
+		$wpdb->show_errors = true;
+	}
+
 	public function test_set_value_multiple() {
 		// Ensure no data exists currently.
 		$values = get_post_meta( $this->post_id, 'test_multi', false );
