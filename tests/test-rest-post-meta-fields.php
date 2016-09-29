@@ -10,11 +10,6 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	public function setUp() {
 		parent::setUp();
 
-		/** @var WP_REST_Server $wp_rest_server */
-		global $wp_rest_server;
-		$this->server = $wp_rest_server = new WP_Test_Spy_REST_Server;
-		do_action( 'rest_api_init' );
-
 		register_meta( 'post', 'test_single', array(
 			'show_in_rest' => true,
 			'single' => true,
@@ -37,6 +32,11 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		register_meta( 'post', 'test_rest_disabled', array(
 			'show_in_rest' => false,
 		));
+
+		/** @var WP_REST_Server $wp_rest_server */
+		global $wp_rest_server;
+		$this->server = $wp_rest_server = new WP_Test_Spy_REST_Server;
+		do_action( 'rest_api_init' );
 
 		$this->post_id = $this->factory->post->create();
 	}
