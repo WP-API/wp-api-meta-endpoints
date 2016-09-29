@@ -238,16 +238,27 @@ abstract class WP_REST_Meta_Fields {
 				'prepare_callback' => 'meta_rest_api_prepare_value',
 			);
 			$default_schema = array(
-				'type'        => empty( $args['type'] ) ? null : $args['type'],
+				'type'        => null,
 				'description' => empty( $args['description'] ) ? '' : $args['description'],
 				'default'     => isset( $args['default'] ) ? $args['default'] : null,
 			);
 			$rest_args = array_merge( $default_args, $rest_args );
 			$rest_args['schema'] = array_merge( $default_schema, $rest_args['schema'] );
 
-			// skip over settings that don't have a defined type in the schema
 			if ( empty( $rest_args['schema']['type'] ) ) {
-				continue;
+				// Skip over settings that don't have a defined type
+				if ( empty( $args['type'] ) ) {
+					continue;
+				}
+
+				if ( $rest_args['single'] ) {
+					$rest_args['schema']['type'] = $args['type'];
+				} else {
+					$rest_args['schema']['type'] = 'array';
+					$rest_args['schema']['items'] = array(
+						'type' => $args['type'],
+					);
+				}
 			}
 
 			$rest_options[ $rest_args['name'] ] = $rest_args;
