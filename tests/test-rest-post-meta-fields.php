@@ -187,4 +187,26 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertContains( 'val1', $meta );
 		$this->assertContains( 'val2', $meta );
 	}
+
+	public function test_delete_value() {
+		add_post_meta( $this->post_id, 'test_single', 'val1' );
+		$current = get_post_meta( $this->post_id, 'test_single', true );
+		$this->assertEquals( 'val1', $current );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'test_single' => null,
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( $this->post_id, 'test_single', false );
+		$this->assertEmpty( $meta );
+	}
 }
