@@ -276,7 +276,7 @@ abstract class WP_REST_Meta_Fields {
 		$fields = $this->get_registered_fields();
 
 		$schema = array(
-			'description' => __( 'Post meta fields.' ),
+			'description' => __( 'Meta fields.' ),
 			'type'        => 'object',
 			'context'     => array( 'view', 'edit' ),
 			'properties'  => array(),
