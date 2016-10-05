@@ -86,7 +86,7 @@ abstract class WP_REST_Meta_Fields {
 	 * Update meta values.
 	 *
 	 * @param  WP_REST_Request $request Full detail about the request.
-	 * @return WP_Error|array
+	 * @return WP_Error|null Error if one occurs, null on success.
 	 */
 	public function update_value( $params, $data, $field_name, $request ) {
 		$fields = $this->get_registered_fields();
