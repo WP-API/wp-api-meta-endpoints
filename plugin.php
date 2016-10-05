@@ -49,7 +49,14 @@ add_action( 'rest_api_init', 'meta_rest_api_init', 11 );
  * @return mixed Value prepared for output.
  */
 function meta_rest_api_prepare_value( $value, $request, $args ) {
-	switch ( $args['schema']['type'] ) {
+	$type = $args['schema']['type'];
+
+	// For multi-value fields, check the item type instead.
+	if ( $type === 'array' && ! empty( $args['schema']['items']['type'] ) ) {
+		$type = $args['schema']['items']['type'];
+	}
+
+	switch ( $type ) {
 		case 'string':
 			$value = strval( $value );
 			break;
