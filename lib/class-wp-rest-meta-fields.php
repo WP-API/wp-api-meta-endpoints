@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Manage a WordPress site's settings.
+ * Manage meta values for an object.
  */
 
 abstract class WP_REST_Meta_Fields {
@@ -31,16 +31,16 @@ abstract class WP_REST_Meta_Fields {
 	}
 
 	/**
-	 * Get the settings.
+	 * Get the `meta` field value.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|array
 	 */
 	public function get_value( $data, $field_name, $request, $type ) {
-		$options  = $this->get_registered_fields();
+		$fields   = $this->get_registered_fields();
 		$response = array();
 
-		foreach ( $options as $name => $args ) {
+		foreach ( $fields as $name => $args ) {
 			$all_values = get_metadata( $this->get_meta_type(), $data['id'], $name, false );
 			if ( $args['single'] ) {
 				if ( empty( $all_values ) ) {
@@ -83,20 +83,20 @@ abstract class WP_REST_Meta_Fields {
 	}
 
 	/**
-	 * Update settings for the settings object.
+	 * Update meta values.
 	 *
 	 * @param  WP_REST_Request $request Full detail about the request.
 	 * @return WP_Error|array
 	 */
 	public function update_value( $params, $data, $field_name, $request ) {
-		$options = $this->get_registered_fields();
+		$fields = $this->get_registered_fields();
 
-		foreach ( $options as $name => $args ) {
+		foreach ( $fields as $name => $args ) {
 			if ( ! array_key_exists( $name, $params ) ) {
 				continue;
 			}
 
-			// a null value means reset the option, which is essentially deleting it
+			// A null value means reset the field, which is essentially deleting it
 			// from the database and then relying on the default value.
 			if ( is_null( $params[ $name ] ) ) {
 				$result = $this->delete_meta_value( $request['id'], $name );
@@ -214,12 +214,12 @@ abstract class WP_REST_Meta_Fields {
 	}
 
 	/**
-	 * Get all the registered options for the Settings API
+	 * Get all the registered meta fields.
 	 *
 	 * @return array
 	 */
 	protected function get_registered_fields() {
-		$rest_options = array();
+		$registered = array();
 
 		foreach ( get_registered_meta_keys( $this->get_meta_type() ) as $name => $args ) {
 			if ( empty( $args['show_in_rest'] ) ) {
@@ -246,7 +246,7 @@ abstract class WP_REST_Meta_Fields {
 			$rest_args['schema'] = array_merge( $default_schema, $rest_args['schema'] );
 
 			if ( empty( $rest_args['schema']['type'] ) ) {
-				// Skip over settings that don't have a defined type
+				// Skip over meta fields that don't have a defined type
 				if ( empty( $args['type'] ) ) {
 					continue;
 				}
@@ -261,14 +261,14 @@ abstract class WP_REST_Meta_Fields {
 				}
 			}
 
-			$rest_options[ $rest_args['name'] ] = $rest_args;
+			$registered[ $rest_args['name'] ] = $rest_args;
 		}
 
-		return $rest_options;
+		return $registered;
 	}
 
 	/**
-	 * Get the site setting schema, conforming to JSON Schema.
+	 * Get the object's `meta` schema, conforming to JSON Schema.
 	 *
 	 * @return array
 	 */
