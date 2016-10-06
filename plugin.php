@@ -52,7 +52,7 @@ function meta_rest_api_prepare_value( $value, $request, $args ) {
 	$type = $args['schema']['type'];
 
 	// For multi-value fields, check the item type instead.
-	if ( $type === 'array' && ! empty( $args['schema']['items']['type'] ) ) {
+	if ( 'array' === $type && ! empty( $args['schema']['items']['type'] ) ) {
 		$type = $args['schema']['items']['type'];
 	}
 
