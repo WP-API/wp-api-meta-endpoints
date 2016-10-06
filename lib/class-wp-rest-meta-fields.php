@@ -164,18 +164,27 @@ abstract class WP_REST_Meta_Fields {
 
 		$to_remove = $current;
 		$to_add = $values;
-		foreach ( $to_remove as $remove_key => $value ) {
-			$add_key = array_search( $value, $to_add );
-			if ( $add_key === false ) {
+		foreach ( $to_add as $add_key => $value ) {
+			$remove_keys = array_keys( $to_remove, $value, true );
+			if ( $remove_keys === false ) {
 				continue;
 			}
 
+			if ( count( $remove_keys ) > 1 ) {
+				// To remove, we need to remove first, then add, so don't touch.
+				continue;
+			}
+
+			$remove_key = $remove_keys[0];
 			unset( $to_remove[ $remove_key ] );
 			unset( $to_add[ $add_key ] );
 		}
 
-		foreach ( $to_add as $value ) {
-			if ( ! add_metadata( $this->get_meta_type(), $object, wp_slash( $name ), wp_slash( $value ) ) ) {
+		// `delete_metadata` removes _all_ instances of the value, so only call
+		// once.
+		$to_remove = array_unique( $to_remove );
+		foreach ( $to_remove as $value ) {
+			if ( ! delete_metadata( $this->get_meta_type(), $object, wp_slash( $name ), wp_slash( $value ) ) ) {
 				return new WP_Error(
 					'rest_meta_database_error',
 					__( 'Could not update meta value in database.' ),
@@ -183,8 +192,8 @@ abstract class WP_REST_Meta_Fields {
 				);
 			}
 		}
-		foreach ( $to_remove as $value ) {
-			if ( ! delete_metadata( $this->get_meta_type(), $object, wp_slash( $name ), wp_slash( $value ) ) ) {
+		foreach ( $to_add as $value ) {
+			if ( ! add_metadata( $this->get_meta_type(), $object, wp_slash( $name ), wp_slash( $value ) ) ) {
 				return new WP_Error(
 					'rest_meta_database_error',
 					__( 'Could not update meta value in database.' ),
