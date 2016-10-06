@@ -164,14 +164,14 @@ abstract class WP_REST_Meta_Fields {
 
 		$to_remove = $current;
 		$to_add = $values;
-		foreach ( $to_remove as &$value ) {
-			$index = array_search( $value, $to_add );
-			if ( $index === false ) {
+		foreach ( $to_remove as $remove_key => $value ) {
+			$add_key = array_search( $value, $to_add );
+			if ( $add_key === false ) {
 				continue;
 			}
 
-			unset( $value );
-			unset( $to_add[ $index ] );
+			unset( $to_remove[ $remove_key ] );
+			unset( $to_add[ $add_key ] );
 		}
 
 		foreach ( $to_add as $value ) {
