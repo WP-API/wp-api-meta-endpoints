@@ -161,8 +161,18 @@ abstract class WP_REST_Meta_Fields {
 		}
 
 		$current = get_metadata( $this->get_meta_type(), $object, $name, false );
-		$to_add = array_diff( $values, $current );
-		$to_remove = array_diff( $current, $values );
+
+		$to_remove = $current;
+		$to_add = $values;
+		foreach ( $to_remove as &$value ) {
+			$index = array_search( $value, $to_add );
+			if ( $index === false ) {
+				continue;
+			}
+
+			unset( $value );
+			unset( $to_add[ $index ] );
+		}
 
 		foreach ( $to_add as $value ) {
 			if ( ! add_metadata( $this->get_meta_type(), $object, wp_slash( $name ), wp_slash( $value ) ) ) {
