@@ -1,4 +1,11 @@
 # WP REST API Meta Endpoints #
+
+## Do not use this plugin :slightly_smiling_face:
+
+These endpoints were created during the initial development of the WordPress REST API, and has subsequently been superseded by core support for registering meta on all object types (posts, terms, etc) using [`register_term_meta`](https://developer.wordpress.org/reference/functions/register_term_meta/) and [`register_post_meta`](https://developer.wordpress.org/reference/functions/register_post_meta/) (or for other object types like Users, the lower-level [`register_term_meta`](https://developer.wordpress.org/reference/functions/register_meta/)) functions in core.
+
+All meta registered with the argument `"show_in_rest" => true` will display within the `meta` key of the resource to which it is registered. Once registered, you may pass updated values as a part of your POST or PUT responses to set those values on the API resources.
+
 **Contributors:** rmccue, rachelbaker, danielbachhuber, joehoyle  
 **Tags:** json, rest, api, rest-api  
 **Requires at least:** 4.4  
